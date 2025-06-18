@@ -1,35 +1,44 @@
 /* General Body Styles */
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: #e0e7eb; /* Soft blue-grey */
     color: #333;
     line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 /* Header Styles */
 header {
-    background-color: #333;
-    color: #fff;
-    padding: 1rem 0;
+    background-color: #2c3e50; /* Dark blue */
+    color: #ecf0f1; /* Light grey */
+    padding: 1.2rem 0;
     text-align: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 header h1 {
     margin: 0;
-    font-size: 2em;
+    font-family: 'Oswald', sans-serif;
+    font-size: 2.8em;
+    letter-spacing: 2px;
 }
 
 /* Main Content Area */
 main {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 20px auto;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    flex-grow: 1; /* Allows main to take up available space */
+    padding: 25px;
+    max-width: 1400px;
+    margin: 25px auto;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
 }
 
 /* Section Hiding */
@@ -37,129 +46,198 @@ main {
     display: none !important;
 }
 
+/* Common Button Styles */
+.btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    text-align: center;
+    white-space: nowrap; /* ボタン内のテキストが折り返されないように */
+}
+
+.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.btn-primary { background-color: #3498db; color: white; } /* Blue */
+.btn-primary:hover { background-color: #217dbb; }
+.btn-success { background-color: #27ae60; color: white; } /* Green */
+.btn-success:hover { background-color: #1f9450; }
+.btn-danger { background-color: #e74c3c; color: white; } /* Red */
+.btn-danger:hover { background-color: #c0392b; }
+.btn-warning { background-color: #f39c12; color: white; } /* Orange */
+.btn-warning:hover { background-color: #d68910; }
+.btn-info { background-color: #1abc9c; color: white; } /* Teal */
+.btn-info:hover { background-color: #148f77; }
+.btn-secondary { background-color: #95a5a6; color: white; } /* Grey */
+.btn-secondary:hover { background-color: #7f8c8d; }
+
+.btn-lg {
+    padding: 15px 25px;
+    font-size: 1.3em;
+}
+
 /* Setup Section */
 #setup-section {
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 20px;
+    padding: 30px;
+    border: 1px solid #cfd8dc; /* Light grey border */
+    border-radius: 10px;
+    background-color: #f9fbfb;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
 }
 
 #setup-section h2, #setup-section h3 {
     text-align: center;
-    color: #555;
-    margin-top: 0;
+    color: #34495e; /* Darker blue-grey */
+    margin-bottom: 25px;
+    font-family: 'Oswald', sans-serif;
 }
 
 .input-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     display: flex;
     flex-direction: column;
 }
 
 .input-group label {
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-weight: bold;
+    color: #555;
+    font-size: 1.1em;
 }
 
 .input-group input[type="text"],
 .input-group input[type="number"] {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1em;
+    padding: 12px;
+    border: 1px solid #bdc3c7;
+    border-radius: 6px;
+    font-size: 1.1em;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+
+.input-group input[type="text"]:focus,
+.input-group input[type="number"]:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
 }
 
 .player-input-container {
     display: flex;
-    justify-content: space-around;
-    gap: 20px;
-    margin-top: 20px;
     flex-wrap: wrap;
+    gap: 30px;
+    margin-top: 30px;
+    justify-content: center;
 }
 
 .player-input-container h4 {
     width: 100%;
     text-align: center;
-    margin-bottom: 10px;
-    color: #666;
+    margin-bottom: 15px;
+    color: #4a6a80;
+    font-size: 1.3em;
+    font-family: 'Oswald', sans-serif;
 }
 
 #awayPlayers, #homePlayers {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 10px;
-    flex: 1; /* 親要素内で均等にスペースを占める */
-    min-width: 280px; /* 最小幅を設定 */
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    flex: 1;
+    min-width: 300px;
+    padding: 15px;
+    background-color: #ecf0f1;
+    border-radius: 8px;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.08);
 }
 
 .player-input-group {
     display: flex;
     flex-direction: column;
+    gap: 5px;
 }
 
 .player-input-group label {
-    font-size: 0.9em;
-    margin-bottom: 3px;
+    font-size: 0.95em;
     color: #777;
+    font-weight: normal;
 }
 
 .player-input-group input[type="text"] {
-    padding: 8px;
-    font-size: 0.95em;
+    padding: 10px;
+    font-size: 1em;
+    border-radius: 5px;
 }
 
 #startGameButton {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    background-color: #28a745;
+    margin-top: 40px;
+    background-color: #2ecc71; /* Emerald green */
     color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1.2em;
-    cursor: pointer;
-    margin-top: 30px;
-    transition: background-color 0.2s ease;
+    font-size: 1.4em;
+    padding: 18px 30px;
 }
-
 #startGameButton:hover {
-    background-color: #218838;
+    background-color: #27ad60;
 }
 
 /* Scoreboard Section */
 #scoreboard-section {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 25px;
+}
+
+.scoreboard-wrapper {
+    overflow-x: auto; /* Enable horizontal scrolling */
+    border: 1px solid #cfd8dc;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
 .scoreboard-container {
-    overflow-x: auto; /* 横スクロールを可能にする */
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    min-width: 600px; /* スコアボードの最小幅を設定 */
+    min-width: 900px; /* Adjust based on max innings and column widths */
+    display: table; /* Use table display for consistent column widths */
+    width: 100%; /* Ensure it spans full width of wrapper */
+    border-collapse: collapse;
 }
 
 .scoreboard-header, .scoreboard-row {
-    display: grid;
-    grid-template-columns: 150px repeat(9, 50px) 50px 50px 50px 70px 70px; /* Team, 9 Innings, R, H, E, AVG, OBP */
-    /* 上記はデフォルトの9イニング。JavaScriptで動的にイニング列を追加・削除するため、柔軟性を持たせる */
-    align-items: center;
-    border-bottom: 1px solid #eee;
-    background-color: #f9f9f9;
+    display: table-row;
+    background-color: #f5f7f8;
     font-weight: bold;
 }
 
+.scoreboard-header {
+    background-color: #34495e; /* Darker blue-grey */
+    color: #ecf0f1;
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+}
+
 .scoreboard-row {
-    background-color: #fff;
+    background-color: #ffffff;
     font-weight: normal;
 }
 
+.scoreboard-row:nth-child(even) {
+    background-color: #fdfdfd; /* Lighter stripe for readability */
+}
+
+
 .scoreboard-header div, .scoreboard-row div {
-    padding: 10px 5px;
+    display: table-cell;
+    padding: 12px 8px;
     text-align: center;
-    border-right: 1px solid #eee;
+    border-bottom: 1px solid #e0e7eb;
+    border-right: 1px solid #e0e7eb;
+    vertical-align: middle;
 }
 
 .scoreboard-header div:last-child, .scoreboard-row div:last-child {
@@ -168,204 +246,176 @@ main {
 
 .scoreboard-header .team-label, .scoreboard-row .team-label {
     text-align: left;
-    padding-left: 10px;
-    background-color: #e9e9e9;
-    position: sticky; /* 横スクロール時にチーム名を固定 */
+    padding-left: 15px;
+    background-color: inherit; /* Maintain row's background */
+    position: sticky;
     left: 0;
-    z-index: 1; /* 他の要素より手前に表示 */
-    border-right: 1px solid #ddd;
+    z-index: 2; /* Higher z-index for team labels */
+    min-width: 150px; /* Ensure team name column is wide enough */
+    border-right: 1px solid #cfd8dc; /* Stronger border for sticky column */
 }
 
-/* 動的に追加されるイニング列にも適用 */
-.inning-col, .inning-score {
-    width: 50px;
-    flex-shrink: 0; /* カラムが縮まないようにする */
-}
+/* Specific column widths */
+.inning-col, .inning-score { width: 55px; } /* Slightly wider for better spacing */
+.rhe-col, .rhe-score { width: 50px; font-weight: bold; background-color: #f0f4f6; }
+.stats-col, .stats-value { width: 75px; background-color: #e8f5e9; font-weight: bold; color: #2ecc71; } /* Light green for stats */
 
-.rhe-col, .rhe-score {
-    width: 50px;
-    flex-shrink: 0;
-    font-weight: bold;
-    background-color: #f0f0f0;
+.rhe-score, .stats-value {
+    font-family: 'Oswald', sans-serif;
 }
-
-.stats-col, .stats-value {
-    width: 70px;
-    flex-shrink: 0;
-    background-color: #e6ffe6; /* Light green for stats */
-}
-
 
 /* Game Info (Count & Bases) */
 .game-info {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
-    margin-bottom: 20px;
-    padding: 15px;
-    background-color: #e0f2f7; /* Light blue background */
+    padding: 20px;
+    background-color: #e8f5e9; /* Light green background */
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    flex-wrap: wrap;
+}
+
+.info-item {
+    padding: 10px 15px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin: 10px;
 }
 
 #currentInningInfo {
-    font-size: 1.5em;
+    font-size: 1.8em;
     font-weight: bold;
-    color: #007bff;
+    color: #2c3e50;
+    font-family: 'Oswald', sans-serif;
 }
 
 .count-display {
     display: flex;
-    gap: 20px;
-    font-size: 1.4em;
+    gap: 25px;
+    font-size: 1.6em;
     font-weight: bold;
+}
+
+.count-item {
+    color: #3498db; /* Blue for counts */
 }
 
 .bases {
-    display: grid;
-    grid-template-areas:
-        ". third ."
-        "second . first"
-        ". . ."; /* 下の空きセルを追加して塁の間隔を広げる */
-    width: 100px;
-    height: 100px;
-    margin: 0 auto; /* 中央寄せ */
-    position: relative; /* 子要素の絶対配置の基準 */
+    width: 120px;
+    height: 120px;
+    position: relative;
+    transform: rotate(45deg); /* Rotate the entire bases container */
+    margin: 0 auto;
 }
 
 .base {
-    width: 30px;
-    height: 30px;
-    background-color: #ccc;
-    border: 1px solid #999;
+    width: 40px;
+    height: 40px;
+    background-color: #bdc3c7; /* Grey for inactive bases */
+    border: 2px solid #95a5a6;
     border-radius: 4px;
+    position: absolute;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 0.8em;
-    font-weight: bold;
-    color: #666;
-    position: absolute;
+    font-size: 0.9em;
+    color: #444;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-#firstBase { grid-area: first; top: calc(50% + 15px); left: calc(50% + 15px); }
-#secondBase { grid-area: second; top: 50%; left: calc(50% - 15px); transform: translate(-100%, -50%); }
-#thirdBase { grid-area: third; top: calc(50% - 15px); left: calc(50% - 15px); }
-
-/* 位置調整（少しだけ重ねるような配置に調整） */
-#firstBase { top: 55%; left: 55%; }
-#secondBase { top: 30%; left: 10%; }
-#thirdBase { top: 10%; left: 55%; }
-
-/* diamond shape approximation */
-#firstBase { transform: rotate(45deg); top: 55px; left: 65px; } /* top-left corner of diamond */
-#secondBase { transform: rotate(45deg); top: 30px; left: 30px; }
-#thirdBase { transform: rotate(45deg); top: -5px; left: 65px; } /* top-left corner of diamond */
+/* Position bases to form a diamond */
+#firstBase { top: 50%; left: 100%; transform: translate(-50%, -50%); }
+#secondBase { top: 0%; left: 50%; transform: translate(-50%, -50%); }
+#thirdBase { top: 50%; left: 0%; transform: translate(-50%, -50%); }
 
 .base.active {
-    background-color: #ffc107; /* Yellow for active bases */
-    border-color: #e0a800;
-    color: #333;
+    background-color: #f1c40f; /* Amber for active bases */
+    border-color: #e6b200;
 }
 
 /* Controls Section */
-.controls {
+.controls-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
 }
 
-.controls div {
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #eee;
+.control-group {
+    background-color: #f9fbfb;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #cfd8dc;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.controls h3 {
+.control-group h3 {
     text-align: center;
     margin-top: 0;
-    color: #444;
-    font-size: 1.2em;
-}
-
-.action-buttons {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.controls button, #currentBatterSelect {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    font-size: 1em;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    width: 100%;
+    margin-bottom: 20px;
+    color: #34495e;
+    font-size: 1.4em;
+    font-family: 'Oswald', sans-serif;
 }
 
 #currentBatterSelect {
-    background-color: #e9ecef;
-    border: 1px solid #ced4da;
-    margin-bottom: 10px;
+    padding: 12px 15px;
+    width: 100%;
+    border: 1px solid #bdc3c7;
+    border-radius: 6px;
+    font-size: 1.1em;
+    margin-bottom: 15px;
+    background-color: #ecf0f1;
+    appearance: none; /* Remove default select arrow */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2334495e%22%20d%3D%22M287%2C197.3L159.2%2C69.5c-3.1-3.1-8.2-3.1-11.3%2C0L5.4%2C197.3c-3.1%2C3.1-3.1%2C8.2%2C0%2C11.3l11.3%2C11.3c3.1%2C3.1%2C8.2%2C3.1%2C11.3%2C0l115.1-115.1l115.1%2C115.1c3.1%2C3.1%2C8.2%2C3.1%2C11.3%2C0l11.3-11.3C290.1%2C205.5%2C290.1%2C200.4%2C287%2C197.3z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 15px top 50%;
+    background-size: 12px auto;
 }
 
-/* Specific button colors */
-#batterOut { background-color: #dc3545; color: white; } /* Red */
-#batterOut:hover { background-color: #c82333; }
-#batterSingle, #batterDouble, #batterTriple, #batterHomeRun { background-color: #007bff; color: white; } /* Blue */
-#batterSingle:hover, #batterDouble:hover, #batterTriple:hover, #batterHomeRun:hover { background-color: #0056b3; }
-#batterWalk, #batterHBP { background-color: #6c757d; color: white; } /* Grey */
-#batterWalk:hover, #batterHBP:hover { background-color: #5a6268; }
-#batterSacrifice, #batterError { background-color: #ffc107; color: #333; } /* Yellow */
-#batterSacrifice:hover, #batterError:hover { background-color: #e0a800; }
-
-.run-error-controls button, .count-bases-controls button, .inning-game-controls button {
-    background-color: #17a2b8; /* Info blue */
-    color: white;
-    margin-top: 10px;
-    display: block; /* Make buttons block level for full width */
-}
-.run-error-controls button:hover, .count-bases-controls button:hover, .inning-game-controls button:hover {
-    background-color: #138496;
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
 }
 
-/* Specific colors for end game / reset game */
-#endGame, #resetGame { background-color: #6f42c1; } /* Purple */
-#endGame:hover, #resetGame:hover { background-color: #5a36a2; }
-#nextInning, #switchSides { background-color: #20c997; } /* Teal */
-#nextInning:hover, #switchSides:hover { background-color: #17a2b8; }
-
+.button-grid-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
 
 /* Player Stats Tables */
 .player-stats-tables {
     display: flex;
-    justify-content: space-around;
-    gap: 20px;
-    flex-wrap: wrap; /* 小さい画面で折り返す */
-    margin-top: 20px;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+    margin-top: 30px;
 }
 
 .player-stats-table {
     flex: 1;
-    min-width: 450px; /* テーブルが小さくなりすぎないように */
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow-x: auto; /* テーブルがはみ出す場合にスクロール */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    min-width: 500px;
+    max-width: 100%;
+    border: 1px solid #cfd8dc;
+    border-radius: 10px;
+    overflow-x: auto;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    background-color: #f9fbfb;
 }
 
 .player-stats-table h3 {
     text-align: center;
-    background-color: #f0f0f0;
-    padding: 10px;
+    background-color: #34495e;
+    color: #ecf0f1;
+    padding: 15px;
     margin: 0;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
-    color: #444;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.6em;
 }
 
 .player-stats-table table {
@@ -374,151 +424,264 @@ main {
 }
 
 .player-stats-table th, .player-stats-table td {
-    border: 1px solid #eee;
-    padding: 8px;
+    border: 1px solid #e0e7eb;
+    padding: 10px 8px;
     text-align: right;
-}
-
-.player-stats-table th:first-child, .player-stats-table td:first-child,
-.player-stats-table th:nth-child(2), .player-stats-table td:nth-child(2) {
-    text-align: left; /* 選手名と背番号は左寄せ */
+    vertical-align: middle;
 }
 
 .player-stats-table th {
-    background-color: #e9ecef;
+    background-color: #ecf0f1;
     font-weight: bold;
+    color: #555;
+    white-space: nowrap;
 }
 
 .player-stats-table tbody tr:nth-child(odd) {
-    background-color: #f6f6f6;
+    background-color: #fdfdfd;
 }
+
+.player-stats-table th:first-child, .player-stats-table td:first-child { text-align: center; } /* # */
+.player-stats-table th:nth-child(2), .player-stats-table td:nth-child(2) { text-align: left; } /* 選手名 */
 
 /* History Section */
 #history-section {
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-top: 20px;
+    padding: 30px;
+    border: 1px solid #cfd8dc;
+    border-radius: 10px;
+    background-color: #f9fbfb;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-top: 25px;
 }
 
 #history-section h2 {
     text-align: center;
-    color: #555;
+    color: #34495e;
+    margin-bottom: 25px;
+    font-family: 'Oswald', sans-serif;
 }
 
 #gameHistoryList {
     list-style: none;
     padding: 0;
-    max-height: 400px;
+    max-height: 500px;
     overflow-y: auto;
-    border: 1px solid #eee;
-    border-radius: 5px;
-    background-color: #fdfdfd;
+    border: 1px solid #e0e7eb;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
 }
 
 #gameHistoryList li {
-    padding: 10px 15px;
-    border-bottom: 1px solid #eee;
+    padding: 15px 20px;
+    border-bottom: 1px solid #eef1f2;
+    transition: background-color 0.2s ease;
 }
 
 #gameHistoryList li:last-child {
     border-bottom: none;
 }
 
+#gameHistoryList li:hover {
+    background-color: #f5f7f8;
+}
+
 #gameHistoryList li strong {
-    color: #007bff;
+    color: #3498db;
+    font-size: 1.1em;
 }
 
 #clearHistoryButton {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background-color: #dc3545;
+    margin-top: 25px;
+    background-color: #e74c3c;
     color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1em;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: background-color 0.2s ease;
+    font-size: 1.1em;
+    padding: 12px 20px;
+}
+#clearHistoryButton:hover {
+    background-color: #c0392b;
 }
 
-#clearHistoryButton:hover {
-    background-color: #c82333;
+
+/* Big Count Section */
+#big-count-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 85vh; /* 画面いっぱいに広げる */
+    background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%); /* Dark gradient background */
+    color: white;
+    padding: 20px;
+    text-align: center;
 }
+
+.big-count-display {
+    display: flex;
+    gap: 70px; /* Increased gap */
+    margin-bottom: 80px; /* More space before button */
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+    justify-content: center;
+}
+
+.big-count-item {
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+    padding: 30px 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px); /* Slightly blur background */
+}
+
+.big-count-item .label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 3.5em; /* Larger label */
+    font-weight: 700;
+    color: #9bd3e9; /* Lighter blue */
+    display: block;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.big-count-item .count {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12em; /* Much larger count */
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 0 30px rgba(255,255,255,0.7), 0 0 50px rgba(255,255,255,0.5); /* More prominent glow */
+    display: block;
+    line-height: 1; /* Adjust line height to prevent extra space */
+}
+
+#backToScoreboardButton {
+    background-color: #3498db; /* Blue */
+    color: white;
+    font-size: 1.5em;
+    padding: 18px 35px;
+}
+#backToScoreboardButton:hover {
+    background-color: #217dbb;
+}
+
 
 /* Footer */
 footer {
     text-align: center;
-    padding: 20px;
-    margin-top: 30px;
-    background-color: #333;
-    color: #fff;
+    padding: 25px;
+    margin-top: auto; /* Push footer to the bottom */
+    background-color: #2c3e50;
+    color: #ecf0f1;
     font-size: 0.9em;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
-    .scoreboard-header, .scoreboard-row {
-        grid-template-columns: 100px repeat(9, 40px) 40px 40px 40px 60px 60px; /* Adjust column widths for smaller screens */
-        font-size: 0.9em;
+@media (max-width: 1200px) {
+    main {
+        padding: 20px;
+        margin: 20px auto;
+        gap: 20px;
     }
-
-    .scoreboard-header .team-label, .scoreboard-row .team-label {
-        width: 100px; /* チームラベルの幅も調整 */
+    .scoreboard-header div, .scoreboard-row div {
+        padding: 10px 5px;
     }
-
-    .inning-col, .inning-score, .rhe-col, .rhe-score, .stats-col, .stats-value {
-        width: auto; /* grid-template-columns で指定されるのでautoで良い */
-    }
-
-    .game-info {
+    .player-stats-tables {
         flex-direction: column;
         align-items: center;
-        gap: 15px;
     }
-
-    .count-display {
-        width: 100%;
-        justify-content: center;
-        gap: 15px;
-    }
-
-    .controls {
-        grid-template-columns: 1fr; /* 1列に */
-    }
-
-    .player-stats-tables {
-        flex-direction: column; /* 縦に並べる */
-        align-items: center;
-    }
-
     .player-stats-table {
-        min-width: unset; /* 最小幅を解除して、親要素の幅に合わせる */
+        min-width: unset;
         width: 100%;
     }
 }
 
+@media (max-width: 992px) {
+    header h1 { font-size: 2.2em; }
+    #setup-section h2, #setup-section h3 { font-size: 1.8em; }
+    .game-info { flex-direction: column; gap: 15px; }
+    .count-display { justify-content: center; width: 100%; }
+    .controls-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .big-count-display { gap: 40px; }
+    .big-count-item .label { font-size: 2.5em; }
+    .big-count-item .count { font-size: 10em; }
+}
+
+@media (max-width: 768px) {
+    header h1 { font-size: 1.8em; }
+    main { padding: 15px; margin: 15px auto; }
+    #setup-section { padding: 20px; }
+    #setup-section h2, #setup-section h3 { font-size: 1.5em; }
+    .input-group label, .input-group input, .player-input-group label, .player-input-group input { font-size: 1em; }
+    #startGameButton { font-size: 1.2em; padding: 15px 25px; }
+
+    .scoreboard-container { min-width: 700px; } /* Further adjustment for smaller screens */
+    .scoreboard-header .team-label, .scoreboard-row .team-label { min-width: 120px; }
+    .inning-col, .inning-score { width: 45px; }
+    .rhe-col, .rhe-score { width: 45px; }
+    .stats-col, .stats-value { width: 65px; }
+
+    .game-info { padding: 15px; }
+    #currentInningInfo { font-size: 1.6em; }
+    .count-display { font-size: 1.4em; gap: 20px; }
+    .bases { width: 100px; height: 100px; }
+    .base { width: 35px; height: 35px; }
+
+    .control-group { padding: 15px; }
+    .control-group h3 { font-size: 1.2em; }
+    .btn { padding: 10px 15px; font-size: 1em; }
+    .btn-lg { padding: 12px 20px; font-size: 1.1em; }
+
+    .player-stats-table th, .player-stats-table td { padding: 8px 5px; font-size: 0.95em; }
+    .player-stats-table th:first-child, .player-stats-table td:first-child { width: 30px; }
+    .player-stats-table th:nth-child(2), .player-stats-table td:nth-child(2) { width: 80px; }
+
+    #history-section { padding: 20px; }
+    #history-section h2 { font-size: 1.5em; }
+    #gameHistoryList li { padding: 12px 15px; }
+
+    .big-count-item .label { font-size: 2em; }
+    .big-count-item .count { font-size: 8em; }
+}
+
 @media (max-width: 480px) {
-    header h1 {
-        font-size: 1.8em;
-    }
+    header h1 { font-size: 1.5em; }
+    main { padding: 10px; margin: 10px auto; }
+    #setup-section { padding: 15px; }
+    #setup-section h2, #setup-section h3 { font-size: 1.3em; margin-bottom: 15px; }
+    .player-input-container { flex-direction: column; gap: 20px; }
+    #awayPlayers, #homePlayers { padding: 10px; }
+    .player-input-group input[type="text"] { font-size: 0.9em; padding: 8px; }
+    #startGameButton { font-size: 1.1em; padding: 12px 20px; margin-top: 25px; }
 
-    main {
-        padding: 10px;
-        margin: 10px auto;
-    }
+    .scoreboard-container { min-width: 500px; } /* Final adjustment for mobile */
+    .scoreboard-header .team-label, .scoreboard-row .team-label { min-width: 90px; padding-left: 8px; }
+    .inning-col, .inning-score, .rhe-col, .rhe-score, .stats-col, .stats-value { width: 35px; padding: 8px 3px; font-size: 0.85em;}
 
-    .input-group label, .player-input-group label {
-        font-size: 0.85em;
-    }
 
-    .player-input-group input[type="text"] {
-        padding: 6px;
-        font-size: 0.9em;
-    }
+    .game-info { padding: 10px; }
+    #currentInningInfo { font-size: 1.4em; }
+    .count-display { font-size: 1.2em; gap: 15px; }
+    .bases { width: 80px; height: 80px; }
+    .base { width: 30px; height: 30px; }
 
-    .action-buttons {
-        grid-template-columns: 1fr; /* ボタンを1列に */
-    }
+    .controls-grid { gap: 15px; }
+    .control-group { padding: 10px; }
+    .control-group h3 { font-size: 1.1em; margin-bottom: 15px; }
+    .button-grid, .button-grid-2col { gap: 8px; }
+    .btn { padding: 8px 12px; font-size: 0.9em; }
+    .btn-lg { padding: 10px 15px; font-size: 1em; }
+
+    .player-stats-table { border-radius: 5px; }
+    .player-stats-table h3 { font-size: 1.4em; padding: 10px; border-radius: 5px 5px 0 0; }
+    .player-stats-table th, .player-stats-table td { padding: 6px 4px; font-size: 0.8em; }
+
+    #history-section { padding: 15px; }
+    #history-section h2 { font-size: 1.3em; margin-bottom: 15px; }
+    #gameHistoryList li { padding: 10px 12px; font-size: 0.9em; }
+    #clearHistoryButton { padding: 10px 15px; font-size: 1em; margin-top: 15px; }
+
+    .big-count-item .label { font-size: 1.8em; margin-bottom: 15px;}
+    .big-count-item .count { font-size: 6em; }
+    #backToScoreboardButton { font-size: 1.2em; padding: 15px 25px; }
 }
