@@ -7,185 +7,208 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>野球スコアボード</h1>
+    <header>
+        <h1>野球スコアボード</h1>
+    </header>
 
-    <div id="setup-section" class="section">
-        <h2>試合設定</h2>
-        <div class="input-group">
-            <label for="awayTeamNameInput">先攻チーム名:</label>
-            <input type="text" id="awayTeamNameInput" value="ビジターズ">
-        </div>
-        <div class="input-group">
-            <label for="homeTeamNameInput">後攻チーム名:</label>
-            <input type="text" id="homeTeamNameInput" value="ホームズ">
-        </div>
-        <div class="input-group">
-            <label for="playerCountInput">選手人数:</label>
-            <input type="number" id="playerCountInput" value="9" min="1" max="25">
-        </div>
-
-        <div class="player-setup">
-            <h3>先攻チーム選手名</h3>
-            <div id="awayPlayers"></div>
-        </div>
-
-        <div class="player-setup">
-            <h3>後攻チーム選手名</h3>
-            <div id="homePlayers"></div>
-        </div>
-
-        <button id="startGameButton">試合開始</button>
-    </div>
-
-    <div id="scoreboard-section" class="section hidden">
-        <h2>スコアボード</h2>
-        <div class="game-info">
-            <span id="currentInningInfo">1回表</span>
-            <span id="outsInfo">O: 0</span>
-            <span id="ballsInfo">B: 0</span>
-            <span id="strikesInfo">S: 0</span>
-        </div>
-
-        <div class="scoreboard">
-            <div class="scoreboard-header">
-                <div>チーム</div>
-                <div class="r-h-e">R</div>
-                <div class="r-h-e">H</div>
-                <div class="r-h-e">E</div>
-                <div class="r-h-e">AVG</div>
-                <div class="r-h-e">OBP</div>
+    <main>
+        <section id="setup-section">
+            <h2>試合設定</h2>
+            <div class="input-group">
+                <label for="awayTeamNameInput">ビジターチーム名:</label>
+                <input type="text" id="awayTeamNameInput" value="ビジターズ">
             </div>
-            <div class="team-row away-team">
-                <div id="awayTeamLabel" class="team-label"></div>
-                <div id="awayTotalScore" class="total-score">0</div>
-                <div id="awayTotalH" class="stat-h">0</div>
-                <div id="awayTotalE" class="stat-e">0</div>
-                <div id="awayTeamAvg" class="stat-avg">.000</div>
-                <div id="awayTeamObp" class="stat-obp">.000</div>
+            <div class="input-group">
+                <label for="homeTeamNameInput">ホームチーム名:</label>
+                <input type="text" id="homeTeamNameInput" value="ホームズ">
             </div>
-            <div class="team-row home-team">
-                <div id="homeTeamLabel" class="team-label"></div>
-                <div id="homeTotalScore" class="total-score">0</div>
-                <div id="homeTotalH" class="stat-h">0</div>
-                <div id="homeTotalE" class="stat-e">0</div>
-                <div id="homeTeamAvg" class="stat-avg">.000</div>
-                <div id="homeTeamObp" class="stat-obp">.000</div>
+            <div class="input-group">
+                <label for="playerCountInput">選手人数 (1チーム):</label>
+                <input type="number" id="playerCountInput" value="9" min="1" max="25">
             </div>
-        </div>
 
-        <div class="bases-diagram">
-            <div id="firstBase" class="base"></div>
-            <div id="secondBase" class="base"></div>
-            <div id="thirdBase" class="base"></div>
-            <div id="homePlate" class="base"></div>
-        </div>
+            <h3>選手名入力</h3>
+            <div class="player-input-container">
+                <h4>ビジターズ</h4>
+                <div id="awayPlayers">
+                    </div>
+                <h4>ホームズ</h4>
+                <div id="homePlayers">
+                    </div>
+            </div>
 
-        <div class="controls">
-            <h3>試合操作</h3>
-            <div class="player-select-group input-group">
-                <label for="currentBatterSelect">現在の打者:</label>
-                <select id="currentBatterSelect"></select>
-            </div>
-            <div class="button-group">
-                <button id="batterOut">アウト</button>
-                <button id="batterSingle">単打 (1B)</button>
-                <button id="batterDouble">二塁打 (2B)</button>
-                <button id="batterTriple">三塁打 (3B)</button>
-                <button id="batterHomeRun">本塁打 (HR)</button>
-                <button id="batterWalk">四球 (BB)</button>
-                <button id="batterHBP">死球 (HBP)</button>
-                <button id="batterSacrifice">犠打/犠飛</button>
-                <button id="batterError">相手失策出塁</button>
-            </div>
-            <div class="button-group">
-                <button id="addRun">+1点</button>
-                <button id="subtractRun">-1点</button>
-                <button id="addError">+1E</button>
-                <button id="subtractError">-1E</button>
-            </div>
-            <div class="button-group">
-                <button id="clearBases">塁上クリア</button>
-                <button id="addBall">ボール</button>
-                <button id="addStrike">ストライク</button>
-                <button id="resetCount">カウントリセット</button>
-            </div>
-            <div class="button-group">
-                <button id="nextInning">次イニング</button>
-                <button id="switchSides">攻守交代</button>
-                <button id="endGame" class="danger">試合終了</button>
-                <button id="resetGame" class="danger">試合リセット</button>
-            </div>
-            <div class="button-group">
-                <button id="showBigCountButton">大画面カウント表示</button>
-            </div>
-        </div>
+            <button id="startGameButton">試合開始</button>
+        </section>
 
-        <h3>選手成績</h3>
-        <h4><span id="awayPlayerStatsTeamName"></span></h4>
-        <table class="player-stats-table">
-            <thead>
-                <tr>
-                    <th>打順</th>
-                    <th>選手名</th>
-                    <th>打数</th>
-                    <th>安打</th>
-                    <th>四球</th>
-                    <th>死球</th>
-                    <th>犠打/犠飛</th>
-                    <th>打率</th>
-                    <th>出塁率</th>
-                </tr>
-            </thead>
-            <tbody id="awayPlayerStatsTableBody">
-                </tbody>
-        </table>
-
-        <h4><span id="homePlayerStatsTeamName"></span></h4>
-        <table class="player-stats-table">
-            <thead>
-                <tr>
-                    <th>打順</th>
-                    <th>選手名</th>
-                    <th>打数</th>
-                    <th>安打</th>
-                    <th>四球</th>
-                    <th>死球</th>
-                    <th>犠打/犠飛</th>
-                    <th>打率</th>
-                    <th>出塁率</th>
-                </tr>
-            </thead>
-            <tbody id="homePlayerStatsTableBody">
-                </tbody>
-        </table>
-    </div>
-
-    <div id="big-count-section" class="section hidden">
-        <h2>カウント表示</h2>
-        <div class="big-count-display">
-            <div class="big-count-item big-balls">
-                <span class="label">BALL</span>
-                <span id="bigBallsCount" class="count">0</span>
+        <section id="scoreboard-section" class="hidden">
+            <div class="scoreboard-container">
+                <div class="scoreboard-header">
+                    <div class="team-label">チーム</div>
+                    <div class="inning-col">1</div>
+                    <div class="inning-col">2</div>
+                    <div class="inning-col">3</div>
+                    <div class="inning-col">4</div>
+                    <div class="inning-col">5</div>
+                    <div class="inning-col">6</div>
+                    <div class="inning-col">7</div>
+                    <div class="inning-col">8</div>
+                    <div class="inning-col">9</div>
+                    <div class="rhe-col">R</div>
+                    <div class="rhe-col">H</div>
+                    <div class="rhe-col">E</div>
+                    <div class="stats-col">AVG</div>
+                    <div class="stats-col">OBP</div>
+                </div>
+                <div class="scoreboard-row away-team">
+                    <div class="team-label" id="awayTeamLabel">ビジターズ</div>
+                    <div class="inning-score">0</div>
+                    <div class="inning-score">0</div>
+                    <div class="inning-score">0</div>
+                    <div class="inning-score">0</div>
+                    <div class="inning-score">0</div>
+                    <div class="inning-score">0</div>
+                    <div class="inning-score">0</div>
+                    <div class="inning-score">0</div>
+                    <div class="inning-score">0</div>
+                    <div class="rhe-score" id="awayTotalScore">0</div>
+                    <div class="rhe-score" id="awayTotalH">0</div>
+                    <div class="rhe-score" id="awayTotalE">0</div>
+                    <div class="stats-value" id="awayTeamAvg">.000</div>
+                    <div class="stats-value" id="awayTeamObp">.000</div>
+                </div>
+                <div class="scoreboard-row home-team">
+                    <div class="team-label" id="homeTeamLabel">ホームズ</div>
+                    <div class="inning-score">0</div>
+                    <div class="inning-score">0</div>
+                    <div class="inning-score">0</div>
+                    <div class="inning-score">0</div>
+                    <div class="inning-score">0</div>
+                    <div class="inning-score">0</div>
+                    <div class="inning-score">0</div>
+                    <div class="inning-score">0</div>
+                    <div class="inning-score">0</div>
+                    <div class="rhe-score" id="homeTotalScore">0</div>
+                    <div class="rhe-score" id="homeTotalH">0</div>
+                    <div class="rhe-score" id="homeTotalE">0</div>
+                    <div class="stats-value" id="homeTeamAvg">.000</div>
+                    <div class="stats-value" id="homeTeamObp">.000</div>
+                </div>
             </div>
-            <div class="big-count-item big-strikes">
-                <span class="label">STRIKE</span>
-                <span id="bigStrikesCount" class="count">0</span>
-            </div>
-            <div class="big-count-item big-outs">
-                <span class="label">OUT</span>
-                <span id="bigOutsCount" class="count">0</span>
-            </div>
-        </div>
-        <button id="backToScoreboardButton">スコアボードに戻る</button>
-    </div>
 
+            <div class="game-info">
+                <div id="currentInningInfo">1回表</div>
+                <div class="count-display">
+                    <span id="ballsInfo">B: 0</span>
+                    <span id="strikesInfo">S: 0</span>
+                    <span id="outsInfo">O: 0</span>
+                </div>
+                <div class="bases">
+                    <div class="base" id="thirdBase">3B</div>
+                    <div class="base" id="secondBase">2B</div>
+                    <div class="base" id="firstBase">1B</div>
+                </div>
+            </div>
 
-    <div id="history-section" class="section">
-        <h2>試合履歴</h2>
-        <ul id="gameHistoryList">
-            </ul>
-        <button id="clearHistoryButton">履歴をクリア</button>
-    </div>
+            <div class="controls">
+                <div class="batter-actions">
+                    <h3>打者操作</h3>
+                    <select id="currentBatterSelect">
+                        </select>
+                    <div class="action-buttons">
+                        <button id="batterOut">アウト</button>
+                        <button id="batterSingle">単打</button>
+                        <button id="batterDouble">二塁打</button>
+                        <button id="batterTriple">三塁打</button>
+                        <button id="batterHomeRun">本塁打</button>
+                        <button id="batterWalk">四球</button>
+                        <button id="batterHBP">死球</button>
+                        <button id="batterSacrifice">犠打/犠飛</button>
+                        <button id="batterError">失策出塁</button>
+                    </div>
+                </div>
+
+                <div class="run-error-controls">
+                    <h3>得点・失策</h3>
+                    <button id="addRun">得点追加</button>
+                    <button id="subtractRun">得点削減</button>
+                    <button id="addError">エラー追加</button>
+                    <button id="subtractError">エラー削減</button>
+                </div>
+
+                <div class="count-bases-controls">
+                    <h3>カウント・塁</h3>
+                    <button id="addBall">ボール</button>
+                    <button id="addStrike">ストライク</button>
+                    <button id="resetCount">カウントリセット</button>
+                    <button id="clearBases">塁クリア</button>
+                </div>
+
+                <div class="inning-game-controls">
+                    <h3>イニング・試合</h3>
+                    <button id="nextInning">次イニング</button>
+                    <button id="switchSides">攻守交代</button>
+                    <button id="endGame">試合終了</button>
+                    <button id="resetGame">試合リセット</button>
+                </div>
+            </div>
+
+            <h2>選手成績</h2>
+            <div class="player-stats-tables">
+                <div class="player-stats-table">
+                    <h3 id="awayPlayerStatsTeamName">ビジターズ</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>選手名</th>
+                                <th>打数</th>
+                                <th>安打</th>
+                                <th>四球</th>
+                                <th>死球</th>
+                                <th>犠打/犠飛</th>
+                                <th>打率</th>
+                                <th>出塁率</th>
+                            </tr>
+                        </thead>
+                        <tbody id="awayPlayerStatsTableBody">
+                            </tbody>
+                    </table>
+                </div>
+                <div class="player-stats-table">
+                    <h3 id="homePlayerStatsTeamName">ホームズ</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>選手名</th>
+                                <th>打数</th>
+                                <th>安打</th>
+                                <th>四球</th>
+                                <th>死球</th>
+                                <th>犠打/犠飛</th>
+                                <th>打率</th>
+                                <th>出塁率</th>
+                            </tr>
+                        </thead>
+                        <tbody id="homePlayerStatsTableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="history-section" class="hidden">
+            <h2>試合履歴</h2>
+            <ul id="gameHistoryList">
+                </ul>
+            <button id="clearHistoryButton">履歴をクリア</button>
+        </section>
+
+        </main>
+
+    <footer>
+        <p>&copy; 2025 Baseball Scoreboard</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>
