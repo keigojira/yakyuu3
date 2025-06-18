@@ -1,3 +1,10 @@
+承知いたしました。`style.css` を半分に分けてお送りします。
+
+---
+
+## `style.css` (1/2)
+
+```css
 /* General Body Styles */
 body {
     font-family: 'Roboto', sans-serif;
@@ -334,7 +341,13 @@ main {
     background-color: #f1c40f; /* Amber for active bases */
     border-color: #e6b200;
 }
+```
 
+---
+
+## `style.css` (2/2)
+
+```css
 /* Controls Section */
 .controls-grid {
     display: grid;
