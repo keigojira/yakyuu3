@@ -175,7 +175,7 @@ h1, h2 {
 .bases-diagram {
     position: relative;
     width: 200px; /* サイズを少し大きくして見やすくする */
-    height: 200px;
+    height: 200px; /* ここを修正 */
     margin: 20px auto;
     background-color: #e0e0e0; /* グラウンドの色 */
     border-radius: 50%; /* 円形にしてダイヤモンドを際立たせる */
@@ -185,7 +185,7 @@ h1, h2 {
 .base {
     position: absolute;
     width: 40px; /* ベースのサイズを大きくする */
-    height: 40px;
+    height: 40px; /* ここを修正 */
     background-color: #fff; /* ベースの色を白に統一 */
     border: 1px solid #666;
     transition: background-color 0.3s ease;
@@ -204,7 +204,7 @@ h1, h2 {
     left: 50%;
     transform: translateX(-50%); /* 中央揃え */
     width: 50px; /* ホームプレートは少し大きくする */
-    height: 50px;
+    height: 50px; /* ここを修正 */
     background-color: #f0f0f0; /* 色を少し濃くして目立たせる */
     border-radius: 5px;
     border-color: #777;
