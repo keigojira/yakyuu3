@@ -181,36 +181,68 @@ h1, h2 {
 }
 
 /* Bases Diagram */
+/* Bases Diagram */
 .bases-diagram {
     position: relative;
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: 200px;
     margin: 20px auto;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #e0e0e0;
+    background-color: #e0e0e0; /* グラウンドの色 */
+    border-radius: 50%; /* 円形にしてダイヤモンドを際立たせる */
+    overflow: hidden;
 }
 
 .base {
     position: absolute;
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     background-color: #bbb;
     border: 1px solid #999;
-    transform: rotate(45deg);
     transition: background-color 0.3s ease;
+    box-sizing: border-box;
+    background-color: #fff; /* ベースの色を白に統一 */
+    border-color: #666;
 }
 
 .base.active {
-    background-color: #ffeb3b; /* Yellow for active */
+    background-color: #ffeb3b; /* 黄色でアクティブ表示 */
     border-color: #fbc02d;
 }
 
-/* Position bases */
-#firstBase { top: 20px; right: 20px; }
-#secondBase { top: 60px; left: 60px; }
-#thirdBase { top: 20px; left: 20px; }
-.home-plate { bottom: 10px; left: calc(50% - 15px); transform: none; border-radius: 5px; background-color: #ccc; }
+/* Position and rotate bases */
+/* ホームプレートを中央下に配置 */
+#homePlate {
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%); /* 中央揃え */
+    width: 50px; /* ホームプレートは少し大きくする */
+    height: 50px;
+    background-color: #f0f0f0; /* 色を少し濃くして目立たせる */
+    border-radius: 5px;
+    border-color: #777;
+    z-index: 2; /* 他のベースより手前に表示 */
+}
+
+/* 1塁 - 右下に配置 */
+#firstBase {
+    bottom: 50px; /* ホームベースから見て右前 */
+    right: 50px;  /* 右に寄せる */
+    transform: rotate(45deg); /* 45度回転 */
+}
+
+/* 2塁 - 中央上に配置 */
+#secondBase {
+    top: 30px; /* 上に寄せる */
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg); /* 中央に配置し、45度回転 */
+}
+
+/* 3塁 - 左下に配置 */
+#thirdBase {
+    bottom: 50px; /* ホームベースから見て左前 */
+    left: 50px;   /* 左に寄せる */
+    transform: rotate(45deg); /* 45度回転 */
+}
 
 
 /* Controls */
