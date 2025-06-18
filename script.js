@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const setupSection = document.getElementById('setup-section');
     const scoreboardSection = document.getElementById('scoreboard-section');
     const historySection = document.getElementById('history-section');
-    const bigCountSection = document.getElementById('big-count-section'); // 新しいセクション
+    // const bigCountSection = document.getElementById('big-count-section'); // 大画面カウント表示関連は削除
 
     const awayTeamNameInput = document.getElementById('awayTeamNameInput');
     const homeTeamNameInput = document.getElementById('homeTeamNameInput');
@@ -69,12 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameHistoryList = document.getElementById('gameHistoryList');
     const clearHistoryButton = document.getElementById('clearHistoryButton');
 
-    // 大きなカウント表示用の要素
-    const showBigCountButton = document.getElementById('showBigCountButton');
-    const backToScoreboardButton = document.getElementById('backToScoreboardButton');
-    const bigBallsCount = document.getElementById('bigBallsCount');
-    const bigStrikesCount = document.getElementById('bigStrikesCount');
-    const bigOutsCount = document.getElementById('bigOutsCount');
+    // 大きなカウント表示用の要素は削除
+    // const showBigCountButton = document.getElementById('showBigCountButton');
+    // const backToScoreboardButton = document.getElementById('backToScoreboardButton');
+    // const bigBallsCount = document.getElementById('bigBallsCount');
+    // const bigStrikesCount = document.getElementById('bigStrikesCount');
+    // const bigOutsCount = document.getElementById('bigOutsCount');
 
 
     // --- Game State Variables ---
@@ -646,7 +646,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupSection.classList.remove('hidden');
         scoreboardSection.classList.add('hidden');
         historySection.classList.remove('hidden'); // 履歴セクションを表示
-        bigCountSection.classList.add('hidden'); // 大きなカウント表示も隠す
+        // bigCountSection.classList.add('hidden'); // 大画面カウント表示も隠す
         displayGameResults(); // 履歴を更新
         resetGame(false); // 履歴には残すが、現在のスコアボードはリセット
     }
@@ -710,12 +710,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         displayPlayerStats(); // 選手スタッツテーブルを更新
 
-        // 新しいカウント表示セクションの更新
-        if (bigBallsCount && bigStrikesCount && bigOutsCount) { // 要素が存在するか確認
-            bigBallsCount.textContent = balls;
-            bigStrikesCount.textContent = strikes;
-            bigOutsCount.textContent = outs;
-        }
+        // 新しいカウント表示セクションの更新は削除
+        // if (bigBallsCount && bigStrikesCount && bigOutsCount) { 
+        //     bigBallsCount.textContent = balls;
+        //     bigStrikesCount.textContent = strikes;
+        //     bigOutsCount.textContent = outs;
+        // }
     }
 
     function updateScoreboardTable() {
@@ -872,7 +872,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Update input fields with loaded team names and player count
             awayTeamNameInput.value = awayTeamName;
-            homeTeamNameInput.value = homeTeamName;
+            homeTeamInput.value = homeTeamName; // ここも修正
             playerCountInput.value = playerCount;
 
             // Generate player input fields and populate them with loaded data
@@ -890,7 +890,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setupSection.classList.add('hidden');
             scoreboardSection.classList.remove('hidden');
             historySection.classList.add('hidden'); // Initially hide history when game is active
-            bigCountSection.classList.add('hidden'); // 大きなカウント表示は常に隠しておく
+            // bigCountSection.classList.add('hidden'); // 大画面カウント表示は常に隠しておく
 
             populateBatterSelect(); // 打者選択リストを更新
             updateUI();
@@ -899,7 +899,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setupSection.classList.remove('hidden');
             scoreboardSection.classList.add('hidden');
             historySection.classList.add('hidden');
-            bigCountSection.classList.add('hidden'); // 大きなカウント表示は常に隠しておく
+            // bigCountSection.classList.add('hidden'); // 大画面カウント表示は常に隠しておく
             generatePlayerInputFields(); // 初回ロード時に選手入力欄を生成
         }
     }
@@ -934,7 +934,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupSection.classList.add('hidden');
         scoreboardSection.classList.remove('hidden');
         historySection.classList.add('hidden');
-        bigCountSection.classList.add('hidden'); // 試合開始時は必ず通常スコアボード
+        // bigCountSection.classList.add('hidden'); // 試合開始時は必ず通常スコアボード
         populateBatterSelect(); // 試合開始時に打者選択を初期化
     });
 
@@ -967,20 +967,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     clearHistoryButton.addEventListener('click', clearGameHistory);
 
-    // 新しいカウント表示ページへの切り替えボタン
-    showBigCountButton.addEventListener('click', () => {
-        scoreboardSection.classList.add('hidden');
-        historySection.classList.add('hidden'); // 履歴も隠す
-        bigCountSection.classList.remove('hidden');
-        updateUI(); // 表示を切り替えた直後にもカウントを更新
-    });
+    // 大画面カウント表示ページへの切り替えボタンは削除
+    // showBigCountButton.addEventListener('click', () => {
+    //     scoreboardSection.classList.add('hidden');
+    //     historySection.classList.add('hidden'); 
+    //     bigCountSection.classList.remove('hidden');
+    //     updateUI();
+    // });
 
-    // スコアボードに戻るボタン
-    backToScoreboardButton.addEventListener('click', () => {
-        bigCountSection.classList.add('hidden');
-        scoreboardSection.classList.remove('hidden');
-        historySection.classList.remove('hidden'); // 履歴も表示に戻す
-    });
+    // スコアボードに戻るボタンは削除
+    // backToScoreboardButton.addEventListener('click', () => {
+    //     bigCountSection.classList.add('hidden');
+    //     scoreboardSection.classList.remove('hidden');
+    //     historySection.classList.remove('hidden');
+    // });
 
     // --- Initial Load ---
     loadGameState(); // Attempt to load ongoing game
