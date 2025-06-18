@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const setupSection = document.getElementById('setup-section');
     const scoreboardSection = document.getElementById('scoreboard-section');
     const historySection = document.getElementById('history-section');
+    const bigCountSection = document.getElementById('big-count-section'); // 新しいセクション
 
     const awayTeamNameInput = document.getElementById('awayTeamNameInput');
     const homeTeamNameInput = document.getElementById('homeTeamNameInput');
@@ -60,13 +61,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const endGameButton = document.getElementById('endGame');
     const resetGameButton = document.getElementById('resetGame');
 
-    const awayPlayerStatsTeamName = document.getElementById('awayPlayerStatsTeamName');
-    const homePlayerStatsTeamName = document.getElementById('homePlayerStatsTeamName');
     const awayPlayerStatsTableBody = document.querySelector('#awayPlayerStatsTable tbody');
     const homePlayerStatsTableBody = document.querySelector('#homePlayerStatsTable tbody');
+    const awayPlayerStatsTeamName = document.getElementById('awayPlayerStatsTeamName');
+    const homePlayerStatsTeamName = document.getElementById('homePlayerStatsTeamName');
 
     const gameHistoryList = document.getElementById('gameHistoryList');
     const clearHistoryButton = document.getElementById('clearHistoryButton');
+
+    // 大きなカウント表示用の要素
+    const showBigCountButton = document.getElementById('showBigCountButton');
+    const backToScoreboardButton = document.getElementById('backToScoreboardButton');
+    const bigBallsCount = document.getElementById('bigBallsCount');
+    const bigStrikesCount = document.getElementById('bigStrikesCount');
+    const bigOutsCount = document.getElementById('bigOutsCount');
 
 
     // --- Game State Variables ---
@@ -84,12 +92,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let awayPlayers = [];
     let homePlayers = [];
 
-    let totalHits = { "ビジターズ": 0, "ホームズ": 0 }; // 初期値を設定
-    let totalErrors = { "ビジターズ": 0, "ホームズ": 0 }; // 初期値を設定
+    let totalHits = {}; // 初期化はinitializeGameで行う
+    let totalErrors = {}; // 初期化はinitializeGameで行う
 
-    // totalTeamAB, PA, H, BB, HBP, SFSH は players 配列から動的に計算
-    // inningScores: Array of objects [{away: score, home: score}, {away: score, home: score}, ...]
-    let inningScores = [];
+    let inningScores = []; // Array of objects [{away: score, home: score}, {away: score, home: score}, ...]
     let gameHistoryLog = []; // Records for the current game session (reset on game end)
 
     let savedGameResults = []; // Records for all past games (persists in localStorage)
@@ -107,9 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return isTopInning ? awayPlayers : homePlayers;
     }
 
-    function getOppositePlayers() {
-        return isTopInning ? homePlayers : awayPlayers;
-    }
+    // function getOppositePlayers() { // 現在未使用だが、将来的に必要になるかも
+    //     return isTopInning ? homePlayers : awayPlayers;
+    // }
 
     function formatStat(value) {
         if (isNaN(value) || !isFinite(value) || value === 0) {
@@ -129,11 +135,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         playerCount = count;
+        // 新しい人数で選手データを初期化または既存データを保持
+        awayPlayers = initializePlayerStats(awayPlayers, playerCount);
+        homePlayers = initializePlayerStats(homePlayers, playerCount);
         createPlayerInputDivs(awayPlayersDiv, 'away', awayPlayers);
         createPlayerInputDivs(homePlayersDiv, 'home', homePlayers);
-        // 新しい人数で選手データを初期化または既存データを保持
-        awayPlayers = initializePlayerStats(awayPlayers, playerCount, awayTeamNameInput.value);
-        homePlayers = initializePlayerStats(homePlayers, playerCount, homeTeamNameInput.value);
         saveGameState(); // 人数変更を保存
     }
 
@@ -150,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function initializePlayerStats(playersArray, count, teamName) {
+    function initializePlayerStats(playersArray, count) {
         const newPlayersArray = [];
         for (let i = 0; i < count; i++) {
             const existingPlayer = playersArray[i];
@@ -309,8 +315,9 @@ document.addEventListener('DOMContentLoaded', () => {
             inningScores[currentInning - 1][team] += count;
         } else {
             // エラーハンドリングまたは新しいイニングスコアの初期化
-            console.error(`Inning ${currentIninning} does not exist in inningScores.`);
-            inningScores.push({ [awayTeamName]: 0, [homeTeamName]: 0 }); // 新しいイニングを追加して対応
+            console.error(`Inning ${currentInning} does not exist in inningScores.`);
+            // 新しいイニングを追加して対応 (基本的には発生しないはずだが念のため)
+            inningScores.push({ [awayTeamName]: 0, [homeTeamName]: 0 });
             inningScores[currentInning - 1][team] = count;
         }
 
@@ -639,6 +646,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupSection.classList.remove('hidden');
         scoreboardSection.classList.add('hidden');
         historySection.classList.remove('hidden'); // 履歴セクションを表示
+        bigCountSection.classList.add('hidden'); // 大きなカウント表示も隠す
         displayGameResults(); // 履歴を更新
         resetGame(false); // 履歴には残すが、現在のスコアボードはリセット
     }
@@ -701,10 +709,17 @@ document.addEventListener('DOMContentLoaded', () => {
         homeTotalELabel.textContent = totalErrors[homeTeamName];
 
         displayPlayerStats(); // 選手スタッツテーブルを更新
+
+        // 新しいカウント表示セクションの更新
+        if (bigBallsCount && bigStrikesCount && bigOutsCount) { // 要素が存在するか確認
+            bigBallsCount.textContent = balls;
+            bigStrikesCount.textContent = strikes;
+            bigOutsCount.textContent = outs;
+        }
     }
 
     function updateScoreboardTable() {
-        const scoreboardDiv = document.querySelector('.scoreboard');
+        // const scoreboardDiv = document.querySelector('.scoreboard'); // 未使用
         const awayTeamRow = document.querySelector('.away-team');
         const homeTeamRow = document.querySelector('.home-team');
 
@@ -715,9 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Ensure enough inning columns in header
         const header = document.querySelector('.scoreboard-header');
         // Calculate current number of inning columns + team label + RHE + AVG + OBP (5 fixed columns)
-        const currentHeaderCols = header.children.length;
-        const fixedCols = 1 + 5; // team-label + R + H + E + AVG + OBP
-        const currentInningCols = currentHeaderCols - fixedCols;
+        // const currentHeaderCols = header.children.length; // 未使用
 
         // 必要に応じてイニングヘッダーを追加 (最大15イニングまで表示可能とする)
         const maxInningsToShow = Math.max(currentInning, 9); // 最低9イニングは表示
@@ -758,7 +771,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const awayScoreDiv = document.createElement('div');
             awayScoreDiv.classList.add('inning-score');
             awayScoreDiv.textContent = awayInningScore;
+            // チーム名とイニングヘッダーの間に挿入
+            // awayTeamRow.children[1] は通常最初のスコアセル（R）なので、その前に挿入する必要があるが、
+            // 動的にイニング列を生成しているため、挿入位置を調整する
             awayTeamRow.insertBefore(awayScoreDiv, awayTeamRow.children[1 + i]);
+
 
             // Home Team Score
             const homeScoreDiv = document.createElement('div');
@@ -821,7 +838,6 @@ document.addEventListener('DOMContentLoaded', () => {
             homePlayers,
             totalHits,
             totalErrors,
-            // totalTeamAB, PA, H, BB, HBP, SFSH は players 配列から計算されるので保存不要
             inningScores,
             gameHistoryLog
         };
@@ -841,10 +857,16 @@ document.addEventListener('DOMContentLoaded', () => {
             awayTeamName = state.awayTeamName;
             homeTeamName = state.homeTeamName;
             playerCount = state.playerCount || 9; // 互換性のため
-            awayPlayers = state.awayPlayers || initializePlayerStats([], playerCount, state.awayTeamName); // 互換性のため
-            homePlayers = state.homePlayers || initializePlayerStats([], playerCount, state.homeTeamName); // 互換性のため
-            totalHits = state.totalHits || { [awayTeamName]: 0, [homeTeamName]: 0 };
-            totalErrors = state.totalErrors || { [awayTeamName]: 0, [homeTeamName]: 0 };
+            // チーム名が変更された場合を考慮して、新しいチーム名で初期化
+            awayPlayers = state.awayPlayers || initializePlayerStats([], playerCount);
+            homePlayers = state.homePlayers || initializePlayerStats([], playerCount);
+
+            // ロードされた選手データに対して名前の入力値を再設定
+            // これはgeneratePlayerInputFields()と連動して行われるべき
+            // 互換性のため、もし古いデータにtotalHitsがなければ初期化
+            totalHits = state.totalHits || { [state.awayTeamName]: 0, [state.homeTeamName]: 0 };
+            totalErrors = state.totalErrors || { [state.awayTeamName]: 0, [state.homeTeamName]: 0 };
+
             inningScores = state.inningScores;
             gameHistoryLog = state.gameHistoryLog || [];
 
@@ -868,6 +890,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setupSection.classList.add('hidden');
             scoreboardSection.classList.remove('hidden');
             historySection.classList.add('hidden'); // Initially hide history when game is active
+            bigCountSection.classList.add('hidden'); // 大きなカウント表示は常に隠しておく
 
             populateBatterSelect(); // 打者選択リストを更新
             updateUI();
@@ -876,6 +899,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setupSection.classList.remove('hidden');
             scoreboardSection.classList.add('hidden');
             historySection.classList.add('hidden');
+            bigCountSection.classList.add('hidden'); // 大きなカウント表示は常に隠しておく
             generatePlayerInputFields(); // 初回ロード時に選手入力欄を生成
         }
     }
@@ -910,6 +934,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupSection.classList.add('hidden');
         scoreboardSection.classList.remove('hidden');
         historySection.classList.add('hidden');
+        bigCountSection.classList.add('hidden'); // 試合開始時は必ず通常スコアボード
         populateBatterSelect(); // 試合開始時に打者選択を初期化
     });
 
@@ -941,6 +966,21 @@ document.addEventListener('DOMContentLoaded', () => {
     resetGameButton.addEventListener('click', () => resetGame());
 
     clearHistoryButton.addEventListener('click', clearGameHistory);
+
+    // 新しいカウント表示ページへの切り替えボタン
+    showBigCountButton.addEventListener('click', () => {
+        scoreboardSection.classList.add('hidden');
+        historySection.classList.add('hidden'); // 履歴も隠す
+        bigCountSection.classList.remove('hidden');
+        updateUI(); // 表示を切り替えた直後にもカウントを更新
+    });
+
+    // スコアボードに戻るボタン
+    backToScoreboardButton.addEventListener('click', () => {
+        bigCountSection.classList.add('hidden');
+        scoreboardSection.classList.remove('hidden');
+        historySection.classList.remove('hidden'); // 履歴も表示に戻す
+    });
 
     // --- Initial Load ---
     loadGameState(); // Attempt to load ongoing game
