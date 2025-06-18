@@ -146,15 +146,6 @@ h1, h2 {
     font-size: 1.1em;
 }
 
-/* Column positioning for dynamic elements */
-/* These will be set by JS, but keeping for clarity */
-/* .team-row.away-team .total-score { grid-column: 11; } */
-/* .team-row.away-team .stat-h { grid-column: 12; } */
-/* .team-row.away-team .stat-e { grid-column: 13; } */
-/* .team-row.away-team .stat-avg { grid-column: 14; } */
-/* .team-row.away-team .stat-obp { grid-column: 15; } */
-
-
 /* Dynamic Inning Score Styles */
 .team-row > div:nth-child(n+2):nth-child(-n+10) { /* Selects inning score divs */
     background-color: #fff;
@@ -181,27 +172,24 @@ h1, h2 {
 }
 
 /* Bases Diagram */
-/* Bases Diagram */
 .bases-diagram {
     position: relative;
-    width: 200px;
+    width: 200px; /* サイズを少し大きくして見やすくする */
     height: 200px;
     margin: 20px auto;
     background-color: #e0e0e0; /* グラウンドの色 */
     border-radius: 50%; /* 円形にしてダイヤモンドを際立たせる */
-    overflow: hidden;
+    overflow: hidden; /* はみ出した部分を隠す */
 }
 
 .base {
     position: absolute;
-    width: 40px;
+    width: 40px; /* ベースのサイズを大きくする */
     height: 40px;
-    background-color: #bbb;
-    border: 1px solid #999;
-    transition: background-color 0.3s ease;
-    box-sizing: border-box;
     background-color: #fff; /* ベースの色を白に統一 */
-    border-color: #666;
+    border: 1px solid #666;
+    transition: background-color 0.3s ease;
+    box-sizing: border-box; /* パディングとボーダーを幅と高さに含める */
 }
 
 .base.active {
@@ -209,7 +197,7 @@ h1, h2 {
     border-color: #fbc02d;
 }
 
-/* Position and rotate bases */
+/* Position and rotate bases - 修正済み */
 /* ホームプレートを中央下に配置 */
 #homePlate {
     bottom: 10px;
@@ -243,7 +231,6 @@ h1, h2 {
     left: 50px;   /* 左に寄せる */
     transform: rotate(45deg); /* 45度回転 */
 }
-
 
 /* Controls */
 .controls h3 {
