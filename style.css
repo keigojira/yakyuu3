@@ -334,13 +334,7 @@ main {
     background-color: #f1c40f; /* Amber for active bases */
     border-color: #e6b200;
 }
-```
 
----
-
-## `style.css` (2/2)
-
-```css
 /* Controls Section */
 .controls-grid {
     display: grid;
