@@ -84,15 +84,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let awayPlayers = [];
     let homePlayers = [];
 
-    let totalHits = { [awayTeamName]: 0, [homeTeamName]: 0 };
-    let totalErrors = { [awayTeamName]: 0, [homeTeamName]: 0 };
-    let totalTeamAB = { [awayTeamName]: 0, [homeTeamName]: 0 }; // チーム合計打席数（打率計算用）
-    let totalTeamPA = { [awayTeamName]: 0, [homeTeamName]: 0 }; // チーム合計打席数（出塁率計算用）
-    let totalTeamH = { [awayTeamName]: 0, [homeTeamName]: 0 }; // チーム合計安打数（打率計算用）
-    let totalTeamBB = { [awayTeamName]: 0, [homeTeamName]: 0 }; // チーム合計四球数（出塁率計算用）
-    let totalTeamHBP = { [awayTeamName]: 0, [homeTeamName]: 0 }; // チーム合計死球数（出塁率計算用）
-    let totalTeamSFSH = { [awayTeamName]: 0, [homeTeamName]: 0 }; // チーム合計犠打/犠飛数（出塁率計算用）
+    let totalHits = { "ビジターズ": 0, "ホームズ": 0 }; // 初期値を設定
+    let totalErrors = { "ビジターズ": 0, "ホームズ": 0 }; // 初期値を設定
 
+    // totalTeamAB, PA, H, BB, HBP, SFSH は players 配列から動的に計算
     // inningScores: Array of objects [{away: score, home: score}, {away: score, home: score}, ...]
     let inningScores = [];
     let gameHistoryLog = []; // Records for the current game session (reset on game end)
@@ -136,9 +131,9 @@ document.addEventListener('DOMContentLoaded', () => {
         playerCount = count;
         createPlayerInputDivs(awayPlayersDiv, 'away', awayPlayers);
         createPlayerInputDivs(homePlayersDiv, 'home', homePlayers);
-        // 新しい人数で選手データを初期化
-        awayPlayers = initializePlayerStats(awayPlayers, playerCount);
-        homePlayers = initializePlayerStats(homePlayers, playerCount);
+        // 新しい人数で選手データを初期化または既存データを保持
+        awayPlayers = initializePlayerStats(awayPlayers, playerCount, awayTeamNameInput.value);
+        homePlayers = initializePlayerStats(homePlayers, playerCount, homeTeamNameInput.value);
         saveGameState(); // 人数変更を保存
     }
 
@@ -155,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function initializePlayerStats(playersArray, count) {
+    function initializePlayerStats(playersArray, count, teamName) {
         const newPlayersArray = [];
         for (let i = 0; i < count; i++) {
             const existingPlayer = playersArray[i];
@@ -165,8 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 hits: existingPlayer ? existingPlayer.hits : 0,     // 安打
                 walks: existingPlayer ? existingPlayer.walks : 0,   // 四球
                 hbp: existingPlayer ? existingPlayer.hbp : 0,       // 死球
-                sacrifice: existingPlayer ? existingPlayer.sacrifice : 0, // 犠打/犠飛
-                // 平均と出塁率は算出時に計算
+                sacrifice: existingPlayer ? existingPlayer.sacrifice : 0, // 犠打/犠飛 (犠打+犠飛)
             });
         }
         return newPlayersArray;
@@ -189,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
         battingPlayers.forEach((player, index) => {
             const option = document.createElement('option');
             option.value = index; // プレイヤーのインデックス
-            option.textContent = player.name;
+            option.textContent = `${index + 1}. ${player.name}`;
             currentBatterSelect.appendChild(option);
         });
     }
@@ -199,56 +193,59 @@ document.addEventListener('DOMContentLoaded', () => {
         const avg = player.atBats > 0 ? player.hits / player.atBats : 0;
 
         // OBP: (H + BB + HBP) / (AB + BB + HBP + SF)
-        // SF (Sacrifice Fly) はここでは sacrifice に含め、SH (Sacrifice Hit/Bunt) は含めない（打席数に含まれないため）
-        // ただし、baseball-referenceなどではSFのみPAに含める場合もあるが、ここでは簡略化のためsacrificeを全て含める
-        // 実際の野球統計では、犠打(SH)は打席数(PA)に含めず、打数(AB)にも含めない。
-        // 犠飛(SF)は打席数(PA)に含めるが、打数(AB)には含めない。
-        // ここでは、sacrificeをSF/SHの合計とみなし、ABには含めず、PAには含める。
-        const paDenominator = player.atBats + player.walks + player.hbp + player.sacrifice;
+        // SF (Sacrifice Fly) は出塁率の分母には含むが、SH (Sacrifice Hit/Bunt) は含めないのが一般的。
+        // ここでは簡略化のため、player.sacrifice は SF と SH の合計とみなし、出塁率の分母に含める。
+        // 野球規則に厳密に従う場合、犠打(SH)は打席数(PA)にも打数(AB)にも含まれない。
+        // 犠飛(SF)は打席数(PA)には含まれるが、打数(AB)には含まれない。
+        // ここでは、sacrificeをPAの分母に含めることで、SFの扱いを簡易的に行う。
+        const paDenominator = player.atBats + player.walks + player.hbp + player.sacrifice; // SF/SHをPAの分母に含める
         const obp = paDenominator > 0 ? (player.hits + player.walks + player.hbp) / paDenominator : 0;
 
         return { avg: formatStat(avg), obp: formatStat(obp) };
     }
 
     function calculateTeamStats() {
-        const currentBattingTeamPlayers = getBattingPlayers();
-        const battingTeamName = getBattingTeamName();
+        const awayTeamPlayers = awayPlayers;
+        const homeTeamPlayers = homePlayers;
 
-        let teamAB = 0;
-        let teamH = 0;
-        let teamBB = 0;
-        let teamHBP = 0;
-        let teamSFSH = 0;
-        let teamPA = 0; // AB + BB + HBP + SF/SH (ここでは犠打もPAに含む)
+        let awayTeamAB = 0, awayTeamH = 0, awayTeamBB = 0, awayTeamHBP = 0, awayTeamSFSH = 0;
+        let homeTeamAB = 0, homeTeamH = 0, homeTeamBB = 0, homeTeamHBP = 0, homeTeamSFSH = 0;
 
-        currentBattingTeamPlayers.forEach(player => {
-            teamAB += player.atBats;
-            teamH += player.hits;
-            teamBB += player.walks;
-            teamHBP += player.hbp;
-            teamSFSH += player.sacrifice;
-            teamPA += player.atBats + player.walks + player.hbp + player.sacrifice;
+        awayTeamPlayers.forEach(player => {
+            awayTeamAB += player.atBats;
+            awayTeamH += player.hits;
+            awayTeamBB += player.walks;
+            awayTeamHBP += player.hbp;
+            awayTeamSFSH += player.sacrifice;
         });
 
-        // チームの合計値を更新
-        totalTeamAB[battingTeamName] = teamAB;
-        totalTeamH[battingTeamName] = teamH;
-        totalTeamBB[battingTeamName] = teamBB;
-        totalTeamHBP[battingTeamName] = teamHBP;
-        totalTeamSFSH[battingTeamName] = teamSFSH;
-        totalTeamPA[battingTeamName] = teamPA;
+        homeTeamPlayers.forEach(player => {
+            homeTeamAB += player.atBats;
+            homeTeamH += player.hits;
+            homeTeamBB += player.walks;
+            homeTeamHBP += player.hbp;
+            homeTeamSFSH += player.sacrifice;
+        });
 
         // チーム打率と出塁率の計算
-        const teamAvg = teamAB > 0 ? teamH / teamAB : 0;
-        const teamObpDenominator = teamAB + teamBB + teamHBP + teamSFSH; // SF/SHもPAに含める
-        const teamObp = teamObpDenominator > 0 ? (teamH + teamBB + teamHBP) / teamObpDenominator : 0;
+        const awayAvg = awayTeamAB > 0 ? awayTeamH / awayTeamAB : 0;
+        const awayObpDenominator = awayTeamAB + awayTeamBB + awayTeamHBP + awayTeamSFSH;
+        const awayObp = awayObpDenominator > 0 ? (awayTeamH + awayTeamBB + awayTeamHBP) / awayObpDenominator : 0;
 
-        const teamAvgLabel = isTopInning ? awayTeamAvgLabel : homeTeamAvgLabel;
-        const teamObpLabel = isTopInning ? awayTeamObpLabel : homeTeamObpLabel;
+        const homeAvg = homeTeamAB > 0 ? homeTeamH / homeTeamAB : 0;
+        const homeObpDenominator = homeTeamAB + homeTeamBB + homeTeamHBP + homeTeamSFSH;
+        const homeObp = homeObpDenominator > 0 ? (homeTeamH + homeTeamBB + homeTeamHBP) / homeObpDenominator : 0;
 
-        teamAvgLabel.textContent = formatStat(teamAvg);
-        teamObpLabel.textContent = formatStat(teamObp);
+        awayTeamAvgLabel.textContent = formatStat(awayAvg);
+        awayTeamObpLabel.textContent = formatStat(awayObp);
+        homeTeamAvgLabel.textContent = formatStat(homeAvg);
+        homeTeamObpLabel.textContent = formatStat(homeObp);
+
+        // totalHits (安打数) を更新 (スコアボード表示用)
+        totalHits[awayTeamName] = awayTeamH;
+        totalHits[homeTeamName] = homeTeamH;
     }
+
 
     function displayPlayerStats() {
         awayPlayerStatsTeamName.textContent = awayTeamName;
@@ -295,14 +292,8 @@ document.addEventListener('DOMContentLoaded', () => {
             player.atBats = 0; player.hits = 0; player.walks = 0; player.hbp = 0; player.sacrifice = 0;
         });
 
-        totalHits = { [awayTeamName]: 0, [homeTeamName]: 0 };
-        totalErrors = { [awayTeamName]: 0, [homeTeamName]: 0 };
-        totalTeamAB = { [awayTeamName]: 0, [homeTeamName]: 0 };
-        totalTeamPA = { [awayTeamName]: 0, [homeTeamName]: 0 };
-        totalTeamH = { [awayTeamName]: 0, [homeTeamName]: 0 };
-        totalTeamBB = { [awayTeamName]: 0, [homeTeamName]: 0 };
-        totalTeamHBP = { [awayTeamName]: 0, [homeTeamName]: 0 };
-        totalTeamSFSH = { [awayTeamName]: 0, [homeTeamName]: 0 };
+        totalHits = { [awayTeamName]: 0, [homeTeamName]: 0 }; // 新しいチーム名で初期化
+        totalErrors = { [awayTeamName]: 0, [homeTeamName]: 0 }; // 新しいチーム名で初期化
 
         gameHistoryLog = []; // Clear current game history log
 
@@ -313,9 +304,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function addRun(count = 1) {
         const team = getBattingTeamName();
-        inningScores[currentInning - 1][team] += count;
+        // 現在のイニングが inningScores 配列の範囲内か確認
+        if (inningScores[currentInning - 1]) {
+            inningScores[currentInning - 1][team] += count;
+        } else {
+            // エラーハンドリングまたは新しいイニングスコアの初期化
+            console.error(`Inning ${currentIninning} does not exist in inningScores.`);
+            inningScores.push({ [awayTeamName]: 0, [homeTeamName]: 0 }); // 新しいイニングを追加して対応
+            inningScores[currentInning - 1][team] = count;
+        }
+
         updateUI();
-        resetPitchCount(); // 得点が入ったらカウントはリセット
+        // 得点が入ってもカウントはリセットしない（ランナーがホームインしただけなので）
         addGameHistoryLog(team + 'が得点しました (' + count + '点).');
         saveGameState();
     }
@@ -359,15 +359,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const battingPlayers = getBattingPlayers();
         const currentBatter = battingPlayers[selectedBatterIndex];
-        const battingTeamName = getBattingTeamName();
 
         if (!currentBatter) {
             console.error("No current batter selected or found.");
             return;
         }
 
-        let runsScored = 0; // この打席で入った点数
-        let isAtBat = true; // 打数としてカウントされるか
+        resetPitchCount(); // 打席結果が出たらカウントは常にリセット
 
         switch (outcomeType) {
             case 'out':
@@ -376,66 +374,66 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentBatter.atBats++; // 打数にカウント
                 break;
             case 'single':
-                advanceRunners(1);
+                const runsSingle = advanceRunners(1);
+                addRun(runsSingle);
                 currentBatter.hits++;
-                addGameHistoryLog(`${currentBatter.name}がヒットを打ちました.`);
                 currentBatter.atBats++; // 打数にカウント
-                totalHits[battingTeamName]++; // チーム合計Hに加算
+                addGameHistoryLog(`${currentBatter.name}がヒットを打ちました. (${runsSingle}点)`);
                 break;
             case 'double':
-                advanceRunners(2);
+                const runsDouble = advanceRunners(2);
+                addRun(runsDouble);
                 currentBatter.hits++;
-                addGameHistoryLog(`${currentBatter.name}が二塁打を打ちました.`);
-                currentBatter.atBats++;
-                totalHits[battingTeamName]++;
+                currentBatter.atBats++; // 打数にカウント
+                addGameHistoryLog(`${currentBatter.name}が二塁打を打ちました. (${runsDouble}点)`);
                 break;
             case 'triple':
-                advanceRunners(3);
+                const runsTriple = advanceRunners(3);
+                addRun(runsTriple);
                 currentBatter.hits++;
-                addGameHistoryLog(`${currentBatter.name}が三塁打を打ちました.`);
-                currentBatter.atBats++;
-                totalHits[battingTeamName]++;
+                currentBatter.atBats++; // 打数にカウント
+                addGameHistoryLog(`${currentBatter.name}が三塁打を打ちました. (${runsTriple}点)`);
                 break;
             case 'homeRun':
-                // 本塁打は特別に処理（全ての塁のランナーと打者自身も得点）
-                runsScored += (bases[0] ? 1 : 0) + (bases[1] ? 1 : 0) + (bases[2] ? 1 : 0) + 1; // ランナーと打者自身の得点
-                addRun(runsScored);
-                clearBases();
+                // 本塁打は全てのランナーと打者自身も得点
+                let runsHomeRun = (bases[0] ? 1 : 0) + (bases[1] ? 1 : 0) + (bases[2] ? 1 : 0) + 1;
+                addRun(runsHomeRun);
+                clearBases(); // 全員ホームインなので塁上クリア
                 currentBatter.hits++;
-                addGameHistoryLog(`${currentBatter.name}がホームラン！(${runsScored}点).`);
-                currentBatter.atBats++;
-                totalHits[battingTeamName]++;
+                currentBatter.atBats++; // 打数にカウント
+                addGameHistoryLog(`${currentBatter.name}がホームラン！(${runsHomeRun}点).`);
                 break;
             case 'walk': // 四球
-                advanceRunners(0); // 0は四球を表す
+                const runsWalk = advanceRunners(0); // 0は四球を表す
+                addRun(runsWalk);
                 currentBatter.walks++;
-                addGameHistoryLog(`${currentBatter.name}が四球を選びました.`);
-                isAtBat = false; // 打数にはカウントしない
+                // 打数にはカウントしない (atBats++ は行わない)
+                addGameHistoryLog(`${currentBatter.name}が四球を選びました. (${runsWalk}点)`);
                 break;
             case 'hbp': // 死球
-                advanceRunners(0); // 死球も四球と同じ進塁ロジック
+                const runsHBP = advanceRunners(0); // 死球も四球と同じ進塁ロジック
+                addRun(runsHBP);
                 currentBatter.hbp++;
-                addGameHistoryLog(`${currentBatter.name}が死球を受けました.`);
-                isAtBat = false; // 打数にはカウントしない
+                // 打数にはカウントしない (atBats++ は行わない)
+                addGameHistoryLog(`${currentBatter.name}が死球を受けました. (${runsHBP}点)`);
                 break;
             case 'sacrifice': // 犠打/犠飛
                 // 犠打/犠飛の場合もアウトは増えるが、打数にはカウントしない
-                addOut();
+                addOut(); // 犠牲打でアウトが増える
                 currentBatter.sacrifice++;
-                addGameHistoryLog(`${currentBatter.name}が犠打/犠飛をしました.`);
-                isAtBat = false; // 打数にはカウントしない
-                // 犠打/犠飛の際の進塁ロジックは別途考慮する必要があるが、ここでは簡略化のためランナーは手動で進めてもらう
+                // 犠打/犠飛での進塁は複雑なので、ランナーは手動で進めてもらう。
+                // ただし、犠飛で得点が入る場合は、advanceRunners を呼び出し、addRun で得点を加算する。
+                // ここでは簡略化のため、ランナーの進塁はユーザーのボタン操作に委ねる。
+                addGameHistoryLog(`${currentBatter.name}が犠打/犠飛をしました. (1アウト追加)`);
+                // 打数にはカウントしない (atBats++ は行わない)
                 break;
             case 'error': // 相手失策出塁
-                advanceRunners(1); // 1塁にランナーが出た場合と同じ進塁ロジック
+                const runsError = advanceRunners(1); // 1塁にランナーが出た場合と同じ進塁ロジック
+                addRun(runsError); // エラーで得点が入る可能性もある
                 addError(); // 守備側にエラーを追加
-                addGameHistoryLog(`${currentBatter.name}が相手失策で出塁しました.`);
                 currentBatter.atBats++; // 打数にカウント (エラーでも打席に立ったので)
+                addGameHistoryLog(`${currentBatter.name}が相手失策で出塁しました. (${runsError}点)`);
                 break;
-        }
-
-        if (outcomeType !== 'homeRun' && outcomeType !== 'sacrifice') { // HRと犠打は個別にアウト処理
-            resetPitchCount();
         }
 
         updateUI();
@@ -463,8 +461,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (balls >= 4) {
             balls = 0;
             strikes = 0;
-            // 四球処理はbatterWalkボタンで行うため、ここでは自動進塁はなし
-            addGameHistoryLog('ボールカウントが4になりました。打者は四球ボタンを押してください。');
+            addGameHistoryLog('ボールカウントが4になりました。四球ボタンを押して打者を進塁させてください。');
+            // 四球処理はbatterWalkボタンで行う
         } else {
             addGameHistoryLog('ボール追加 (' + balls + 'B).');
         }
@@ -477,8 +475,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (strikes >= 3) {
             strikes = 0;
             balls = 0;
-            // 三振処理はbatterOutボタンで行うため、ここでは自動アウトはなし
-            addGameHistoryLog('ストライクカウントが3になりました。打者はアウトボタンを押してください。');
+            addGameHistoryLog('ストライクカウントが3になりました。アウトボタンを押して打者をアウトにしてください。');
+            // 三振処理はbatterOutボタンで行う
         } else {
             addGameHistoryLog('ストライク追加 (' + strikes + 'S).');
         }
@@ -490,7 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
         balls = 0;
         strikes = 0;
         updateUI();
-        addGameHistoryLog('カウントリセット.');
+        // addGameHistoryLog('カウントリセット.'); // 各打席結果でリセットされるのでログは不要
         saveGameState();
     }
 
@@ -502,38 +500,68 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * @param {number} hitType 0=walk/HBP, 1=single, 2=double, 3=triple
+     * @param {number} advanceType 0=walk/HBP, 1=single, 2=double, 3=triple
+     * @returns {number} scoredRuns - このプレイで入った得点
      */
-    function advanceRunners(hitType) {
-        let runsScored = 0;
+    function advanceRunners(advanceType) {
+        let scoredRuns = 0;
+        let newBases = [false, false, false]; // 次の塁上状況
 
-        // ランナーを進めるロジック
-        // まず、ホームインするランナーを計算し、ベースを空ける
-        if (hitType === 1) { // Single or Walk/HBP
-            if (bases[2]) { runsScored++; bases[2] = false; } // 3塁ランナーはホームイン
-            if (bases[1]) { bases[2] = true; bases[1] = false; } // 2塁ランナーは3塁へ
-            if (bases[0]) { bases[1] = true; bases[0] = false; } // 1塁ランナーは2塁へ
-            bases[0] = true; // バッターは1塁へ
-        } else if (hitType === 2) { // Double
-            if (bases[2]) { runsScored++; bases[2] = false; }
-            if (bases[1]) { runsScored++; bases[1] = false; }
-            if (bases[0]) { bases[2] = true; bases[0] = false; }
-            bases[1] = true; // バッターは2塁へ
-        } else if (hitType === 3) { // Triple
-            if (bases[2]) { runsScored++; bases[2] = false; }
-            if (bases[1]) { runsScored++; bases[1] = false; }
-            if (bases[0]) { runsScored++; bases[0] = false; }
-            bases[2] = true; // バッターは3塁へ
+        // まず、現在のランナーの進塁をシミュレート
+        // 3塁ランナー
+        if (bases[2]) {
+            scoredRuns++; // 3塁ランナーはホームイン
         }
-        // 四死球はヒットタイプ0で処理されるので、単打と同じように進塁
-
-        if (runsScored > 0) {
-            addRun(runsScored); // 得点を追加
+        // 2塁ランナー
+        if (bases[1]) {
+            if (advanceType === 1 || advanceType === 0) { // 単打または四死球の場合、2塁から3塁へ
+                newBases[2] = true;
+            } else if (advanceType === 2 || advanceType === 3) { // 二塁打または三塁打の場合、2塁からホームイン
+                scoredRuns++;
+            }
+        }
+        // 1塁ランナー
+        if (bases[0]) {
+            if (advanceType === 0) { // 四死球の場合、1塁から2塁へ (押し出し)
+                newBases[1] = true;
+            } else if (advanceType === 1) { // 単打の場合、1塁から2塁へ
+                newBases[1] = true;
+            } else if (advanceType === 2) { // 二塁打の場合、1塁から3塁へ
+                newBases[2] = true;
+            } else if (advanceType === 3) { // 三塁打の場合、1塁からホームイン
+                scoredRuns++;
+            }
         }
 
-        updateUI();
-        addGameHistoryLog('ランナー進塁 (' + (hitType === 0 ? '四死球' : hitType + '塁打') + ').');
-        saveGameState();
+        // 打者の進塁
+        if (advanceType === 0) { // 四死球
+            // 1塁にランナーがいなければバッターは1塁へ
+            if (!bases[0]) {
+                newBases[0] = true;
+            } else if (!bases[1]) { // 1塁にランナーがいて、2塁がいなければ1塁ランナーを押し出してバッターは1塁へ
+                newBases[1] = true; // 1塁ランナーが2塁へ
+                newBases[0] = true; // バッターは1塁へ
+            } else if (!bases[2]) { // 1,2塁にランナーがいて、3塁がいなければ1,2塁ランナーを押し出し
+                newBases[2] = true; // 2塁ランナーが3塁へ
+                newBases[1] = true; // 1塁ランナーが2塁へ
+                newBases[0] = true; // バッターは1塁へ
+            } else { // 満塁で押し出しの場合
+                scoredRuns++; // 3塁ランナーがホームイン
+                newBases[2] = true; // 2塁ランナーが3塁へ
+                newBases[1] = true; // 1塁ランナーが2塁へ
+                newBases[0] = true; // バッターは1塁へ
+            }
+
+        } else if (advanceType === 1) { // 単打
+            newBases[0] = true;
+        } else if (advanceType === 2) { // 二塁打
+            newBases[1] = true;
+        } else if (advanceType === 3) { // 三塁打
+            newBases[2] = true;
+        }
+
+        bases = newBases; // 新しい塁上状況を反映
+        return scoredRuns;
     }
 
 
@@ -557,22 +585,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function nextInning() {
-        if (!isTopInning) { // 現在裏イニングの場合のみ、次のイニングの表へ進む
-            currentInning++;
-            isTopInning = true;
-            if (!inningScores[currentInning - 1]) {
-                inningScores.push({ [awayTeamName]: 0, [homeTeamName]: 0 });
+        // 次のイニングへ進む前に、現在の攻守を強制的に終わらせる
+        if (outs < 3) {
+            if (!confirm("アウトカウントが3未満ですが、強制的にイニングを進めますか？")) {
+                return;
             }
-        } else { // 現在表イニングの場合、裏イニングへ進む
-            isTopInning = false;
+            // 強制的に3アウトにする
+            outs = 3;
         }
-        outs = 0;
-        balls = 0;
-        strikes = 0;
-        clearBases();
-        populateBatterSelect(); // 打者選択リストを更新
+        switchSides(); // これでoutsがリセットされ、イニングが進む
+        addGameHistoryLog('強制的に次イニングへ.');
         updateUI();
-        addGameHistoryLog('イニング変更: ' + currentInning + '回' + (isTopInning ? '表' : '裏'));
         saveGameState();
     }
 
@@ -585,20 +608,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const result = `${awayTeamName}: ${awayTotal} - ${homeTeamName}: ${homeTotal}`;
         const winner = awayTotal > homeTotal ? awayTeamName : (homeTotal > awayTotal ? homeTeamName : '引き分け');
 
+        // 最終的なチームスタッツを計算
+        const awayTeamStatTotals = calculateTeamStatTotals(awayPlayers);
+        const homeTeamStatTotals = calculateTeamStatTotals(homePlayers);
+
         const gameResult = {
-            date: new Date().toLocaleString(),
+            date: new Date().toLocaleString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
             awayTeam: awayTeamName,
             homeTeam: homeTeamName,
             awayScore: awayTotal,
             homeScore: homeTotal,
-            awayHits: totalTeamH[awayTeamName],
-            homeHits: totalTeamH[homeTeamName],
+            awayHits: totalHits[awayTeamName],
+            homeHits: totalHits[homeTeamName],
             awayErrors: totalErrors[awayTeamName],
             homeErrors: totalErrors[homeTeamName],
-            awayAvg: formatStat(totalTeamH[awayTeamName] / (totalTeamAB[awayTeamName] || 1)),
-            homeAvg: formatStat(totalTeamH[homeTeamName] / (totalTeamAB[homeTeamName] || 1)),
-            awayObp: formatStat((totalTeamH[awayTeamName] + totalTeamBB[awayTeamName] + totalTeamHBP[awayTeamName]) / (totalTeamAB[awayTeamName] + totalTeamBB[awayTeamName] + totalTeamHBP[awayTeamName] + totalTeamSFSH[awayTeamName] || 1)),
-            homeObp: formatStat((totalTeamH[homeTeamName] + totalTeamBB[homeTeamName] + totalTeamHBP[homeTeamName]) / (totalTeamAB[homeTeamName] + totalTeamBB[homeTeamName] + totalTeamHBP[homeTeamName] + totalTeamSFSH[homeTeamName] || 1)),
+            awayAvg: formatStat(awayTeamStatTotals.totalH / (awayTeamStatTotals.totalAB || 1)),
+            homeAvg: formatStat(homeTeamStatTotals.totalH / (homeTeamStatTotals.totalAB || 1)),
+            awayObp: formatStat((awayTeamStatTotals.totalH + awayTeamStatTotals.totalBB + awayTeamStatTotals.totalHBP) / (awayTeamStatTotals.totalAB + awayTeamStatTotals.totalBB + awayTeamStatTotals.totalHBP + awayTeamStatTotals.totalSFSH || 1)),
+            homeObp: formatStat((homeTeamStatTotals.totalH + homeTeamStatTotals.totalBB + homeTeamStatTotals.totalHBP) / (homeTeamStatTotals.totalAB + homeTeamStatTotals.totalBB + homeTeamStatTotals.totalHBP + homeTeamStatTotals.totalSFSH || 1)),
             winner: winner,
             details: JSON.parse(JSON.stringify(inningScores))
         };
@@ -627,6 +654,23 @@ document.addEventListener('DOMContentLoaded', () => {
         saveGameState(); // Reset state
     }
 
+    // チーム全体の統計合計を計算するヘルパー関数
+    function calculateTeamStatTotals(players) {
+        let totalAB = 0;
+        let totalH = 0;
+        let totalBB = 0;
+        let totalHBP = 0;
+        let totalSFSH = 0;
+        players.forEach(player => {
+            totalAB += player.atBats;
+            totalH += player.hits;
+            totalBB += player.walks;
+            totalHBP += player.hbp;
+            totalSFSH += player.sacrifice;
+        });
+        return { totalAB, totalH, totalBB, totalHBP, totalSFSH };
+    }
+
     // --- UI Update Functions ---
 
     function updateUI() {
@@ -645,17 +689,17 @@ document.addEventListener('DOMContentLoaded', () => {
         secondBase.classList.toggle('active', bases[1]);
         thirdBase.classList.toggle('active', bases[2]);
 
-        // Update Total Hits and Errors
+        // Update Scores and Totals
+        updateScoreboardTable();
+
+        // Update Total Hits and Errors (これは calculateTeamStats で更新されるので呼び出す)
+        calculateTeamStats(); // 最新の選手データでチーム統計を計算
+
         awayTotalHLabel.textContent = totalHits[awayTeamName];
         homeTotalHLabel.textContent = totalHits[homeTeamName];
         awayTotalELabel.textContent = totalErrors[awayTeamName];
         homeTotalELabel.textContent = totalErrors[homeTeamName];
 
-        // Update Team AVG and OBP
-        calculateTeamStats(); // 最新の選手データでチーム統計を計算
-
-        // Update Scores and Totals
-        updateScoreboardTable();
         displayPlayerStats(); // 選手スタッツテーブルを更新
     }
 
@@ -675,41 +719,53 @@ document.addEventListener('DOMContentLoaded', () => {
         const fixedCols = 1 + 5; // team-label + R + H + E + AVG + OBP
         const currentInningCols = currentHeaderCols - fixedCols;
 
-        for (let i = currentInningCols; i < currentInning; i++) {
-            if (i < 9) { // Default 9 innings are already there
-                // Do nothing if it's one of the first 9 innings and exists
-            } else { // Add new inning header if beyond 9th inning
-                const newInningHeader = document.createElement('div');
-                newInningHeader.classList.add('inning-col');
-                newInningHeader.textContent = i + 1;
-                // Insert before RHE columns (there are 5 fixed columns at the end)
-                header.insertBefore(newInningHeader, header.children[header.children.length - 5]);
+        // 必要に応じてイニングヘッダーを追加 (最大15イニングまで表示可能とする)
+        const maxInningsToShow = Math.max(currentInning, 9); // 最低9イニングは表示
+
+        // ヘッダーのイニング番号を更新/追加
+        const existingInningHeaders = header.querySelectorAll('.inning-col');
+        for (let i = 0; i < maxInningsToShow; i++) {
+            let inningHeaderDiv;
+            if (i < existingInningHeaders.length) {
+                inningHeaderDiv = existingInningHeaders[i];
+            } else {
+                inningHeaderDiv = document.createElement('div');
+                inningHeaderDiv.classList.add('inning-col');
+                // RHE/AVG/OBPの前の位置に挿入
+                header.insertBefore(inningHeaderDiv, header.children[header.children.length - 5]);
             }
+            inningHeaderDiv.textContent = i + 1;
+        }
+
+        // 余分なイニングヘッダーを削除 (例えば9回で終わったのに10回が残っていた場合など)
+        for (let i = existingInningHeaders.length - 1; i >= maxInningsToShow; i--) {
+            existingInningHeaders[i].remove();
         }
 
         let awayTotal = 0;
         let homeTotal = 0;
 
-        inningScores.forEach((inning, index) => {
+        // スコア表示部分も、maxInningsToShowに基づいて更新
+        for (let i = 0; i < maxInningsToShow; i++) {
+            const inning = inningScores[i] || { [awayTeamName]: 0, [homeTeamName]: 0 }; // 存在しないイニングは0点で初期化
             const awayInningScore = inning[awayTeamName] || 0;
             const homeInningScore = inning[homeTeamName] || 0;
 
             awayTotal += awayInningScore;
             homeTotal += homeInningScore;
 
-            // Create and append score for away team
+            // Away Team Score
             const awayScoreDiv = document.createElement('div');
             awayScoreDiv.classList.add('inning-score');
             awayScoreDiv.textContent = awayInningScore;
-            // Insert after team label and previous innings (account for the initial team label div)
-            awayTeamRow.insertBefore(awayScoreDiv, awayTeamRow.children[1 + index]);
+            awayTeamRow.insertBefore(awayScoreDiv, awayTeamRow.children[1 + i]);
 
-            // Create and append score for home team
+            // Home Team Score
             const homeScoreDiv = document.createElement('div');
             homeScoreDiv.classList.add('inning-score');
             homeScoreDiv.textContent = homeInningScore;
-            homeTeamRow.insertBefore(homeScoreDiv, homeTeamRow.children[1 + index]);
-        });
+            homeTeamRow.insertBefore(homeScoreDiv, homeTeamRow.children[1 + i]);
+        }
 
         awayTotalScoreLabel.textContent = awayTotal;
         homeTotalScoreLabel.textContent = homeTotal;
@@ -765,12 +821,7 @@ document.addEventListener('DOMContentLoaded', () => {
             homePlayers,
             totalHits,
             totalErrors,
-            totalTeamAB,
-            totalTeamPA,
-            totalTeamH,
-            totalTeamBB,
-            totalTeamHBP,
-            totalTeamSFSH,
+            // totalTeamAB, PA, H, BB, HBP, SFSH は players 配列から計算されるので保存不要
             inningScores,
             gameHistoryLog
         };
@@ -790,16 +841,10 @@ document.addEventListener('DOMContentLoaded', () => {
             awayTeamName = state.awayTeamName;
             homeTeamName = state.homeTeamName;
             playerCount = state.playerCount || 9; // 互換性のため
-            awayPlayers = state.awayPlayers || initializePlayerStats([], playerCount); // 互換性のため
-            homePlayers = state.homePlayers || initializePlayerStats([], playerCount); // 互換性のため
+            awayPlayers = state.awayPlayers || initializePlayerStats([], playerCount, state.awayTeamName); // 互換性のため
+            homePlayers = state.homePlayers || initializePlayerStats([], playerCount, state.homeTeamName); // 互換性のため
             totalHits = state.totalHits || { [awayTeamName]: 0, [homeTeamName]: 0 };
             totalErrors = state.totalErrors || { [awayTeamName]: 0, [homeTeamName]: 0 };
-            totalTeamAB = state.totalTeamAB || { [awayTeamName]: 0, [homeTeamName]: 0 };
-            totalTeamPA = state.totalTeamPA || { [awayTeamName]: 0, [homeTeamName]: 0 };
-            totalTeamH = state.totalTeamH || { [awayTeamName]: 0, [homeTeamName]: 0 };
-            totalTeamBB = state.totalTeamBB || { [awayTeamName]: 0, [homeTeamName]: 0 };
-            totalTeamHBP = state.totalTeamHBP || { [awayTeamName]: 0, [homeTeamName]: 0 };
-            totalTeamSFSH = state.totalTeamSFSH || { [awayTeamName]: 0, [homeTeamName]: 0 };
             inningScores = state.inningScores;
             gameHistoryLog = state.gameHistoryLog || [];
 
